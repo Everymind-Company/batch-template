@@ -8,10 +8,10 @@ output application/json
     "correlationId": correlationId,
     "timestamp": now(),
     "errorDetails": [
-        {
-            "code": 415,
-            "message": "Unsupported Media Type",
-            "additionalInfo": "Unsupported Media Type : " ++ (error.description default "")
-        }
-    ]
+            {
+                "code": 415,
+                "message": "Unsupported Media Type",
+                "additionalInfo": "Unsupported Media Type : " ++ (error.description default "")
+            }
+        ]
 }

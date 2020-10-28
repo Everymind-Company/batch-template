@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
-	<flow name="api-main">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:os="http://www.mulesoft.org/schema/mule/os"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+    <flow name="api-main">
         <http:listener config-ref="batch-api-httpsListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
@@ -41,23 +47,23 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\healthcheck:api-config">
-		<flow-ref doc:name="batch-api-util-get-healthcheck" doc:id="9b31a475-2518-4e69-819a-0c37ec348e76" name="batch-api-util-get-healthcheck" />
+        <flow-ref doc:name="batch-api-util-get-healthcheck" doc:id="9b31a475-2518-4e69-819a-0c37ec348e76" name="batch-api-util-get-healthcheck" />
     </flow>
-	<flow name="get:\batch\run:api-config">
-		<flow-ref doc:name="batch-api-implementation-main" doc:id="52a98730-7d61-4d29-a859-6da9ca2646dc" name="batch-api-implementation-main" />
+    <flow name="get:\batch\run:api-config">
+        <flow-ref doc:name="batch-api-implementation-main" doc:id="52a98730-7d61-4d29-a859-6da9ca2646dc" name="batch-api-implementation-main" />
     </flow>
-	<flow name="get:\batch\status:api-config">
-		<flow-ref doc:name="batch-api-implementation-status-check-subflow" doc:id="23e070c1-e36c-4ef9-8985-d101ab396934" name="batch-api-implementation-status-check-subflow" />
-		<set-payload value="#[output application/json --- payload]" doc:name="/json" doc:id="4a78c002-204a-4676-9749-3659970e810e" />
+    <flow name="get:\batch\status:api-config">
+        <flow-ref doc:name="batch-api-implementation-status-check-subflow" doc:id="23e070c1-e36c-4ef9-8985-d101ab396934" name="batch-api-implementation-status-check-subflow" />
+        <set-payload value="#[output application/json --- payload]" doc:name="/json" doc:id="4a78c002-204a-4676-9749-3659970e810e" />
     </flow>
-	<flow name="get:\failure:api-config">
+    <flow name="get:\failure:api-config">
         <os:retrieve-all doc:name="Retrieve all" doc:id="fe65f63a-2c4a-4f79-b468-49d1b8aba910" objectStore="Batch_Error_Object_store" />
         <set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="3129bf3f-5eac-4017-8ce0-b5b226136f3d" />
     </flow>
     <flow name="delete:\batch\status:api-config">
-		<flow-ref doc:name="batch-api-implementation-status-clear" doc:id="26a1d005-8dc6-414f-aa1c-d1d2b5a59c30" name="batch-api-implementation-status-clear" />
+        <flow-ref doc:name="batch-api-implementation-status-clear" doc:id="26a1d005-8dc6-414f-aa1c-d1d2b5a59c30" name="batch-api-implementation-status-clear" />
     </flow>
-	<flow name="get:\data:api-config">
-		<flow-ref doc:name="batch-api-implementation-data-get" doc:id="0ee07ff6-2582-4fbb-bbde-8cd5c05a2ba4" name="batch-api-implementation-data-get" />
+    <flow name="get:\data:api-config">
+        <flow-ref doc:name="batch-api-implementation-data-get" doc:id="0ee07ff6-2582-4fbb-bbde-8cd5c05a2ba4" name="batch-api-implementation-data-get" />
     </flow>
 </mule>

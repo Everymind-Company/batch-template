@@ -2,11 +2,13 @@
 
 <mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
 	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
-	xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd 
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
 http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
@@ -14,32 +16,23 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 
-	<apikit:config name="api-config" api="api.raml" outboundHeadersMapName="outboundHeaders"
-		httpStatusVarName="httpStatus" />
-		
-	<global-property doc:name="Global Property Mule Env" doc:id="9a5141cc-0069-4928-8aa4-c8290d669364"
-		name="mule.env" value="local" />
-	<global-property doc:name="Global Property Mule Key" doc:id="82135794-0ec3-43e0-82d0-535be5609a8f"
-		name="mule.key" value="1111222233334444" />
-	<configuration-properties doc:name="Configuration properties env file"
-		doc:id="344ef155-3a4b-4cd6-be40-af3fbfc93fd7" file="config/${mule.env}.yaml" />
+	<apikit:config name="api-config" api="api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
 
-	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config"
-		doc:id="7a2a75f3-7ea8-48f9-ab1c-ac47b3bf05e4" file="config/secured/${mule.env}.yaml" key="${mule.key}">
+	<global-property doc:name="Global Property Mule Env" doc:id="9a5141cc-0069-4928-8aa4-c8290d669364" name="mule.env" value="local" />
+	<global-property doc:name="Global Property Mule Key" doc:id="82135794-0ec3-43e0-82d0-535be5609a8f" name="mule.key" value="1111222233334444" />
+	<configuration-properties doc:name="Configuration properties env file" doc:id="344ef155-3a4b-4cd6-be40-af3fbfc93fd7" file="config/${mule.env}.yaml" />
+
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="7a2a75f3-7ea8-48f9-ab1c-ac47b3bf05e4" file="config/secured/${mule.env}.yaml" key="${mule.key}">
 	</secure-properties:config>
 
-	<configuration doc:name="Configuration" doc:id="1ecac876-a35b-47dc-a669-8eeed036345f"
-		defaultErrorHandler-ref="batch-api-error-handler" />
+	<configuration doc:name="Configuration" doc:id="1ecac876-a35b-47dc-a669-8eeed036345f" defaultErrorHandler-ref="batch-api-error-handler" />
 
-	<configuration-properties doc:name="Configuration properties"
-		doc:id="24db6760-b272-4e76-b379-d2eabb952895" file="config/common.yaml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="24db6760-b272-4e76-b379-d2eabb952895" file="config/common.yaml" />
 
-	<http:listener-config name="batch-api-httpsListenerConfig" doc:name="HTTP Listener config"
-		doc:id="40c0510e-8bd8-4af5-8067-7e612a1d03a3">
+	<http:listener-config name="batch-api-httpsListenerConfig" doc:name="HTTP Listener config" doc:id="40c0510e-8bd8-4af5-8067-7e612a1d03a3">
 		<http:listener-connection protocol="HTTPS" host="${https.host}" port="${https.port}">
 			<tls:context>
-				<tls:key-store type="jks" path="certificates/${mule.env}-sender.jks" alias="${secure::keystore.alias}"
-					keyPassword="${secure::keystore.keyPassword}" password="${secure::keystore.password}" />
+				<tls:key-store type="jks" path="certificates/${mule.env}-sender.jks" alias="${secure::keystore.alias}" keyPassword="${secure::keystore.keyPassword}" password="${secure::keystore.password}" />
 			</tls:context>
 		</http:listener-connection>
 	</http:listener-config>
@@ -48,20 +41,16 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 		<tls:trust-store insecure="${batch.data.secure}" />
 	</tls:context>
 
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration"
-		doc:id="264f184d-41c5-467c-99f3-762e5b732646">
-		<http:request-connection protocol="HTTPS" host="${batch.data.host}" port="${batch.data.port}"
-			tlsContext="TLS_Context1" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="264f184d-41c5-467c-99f3-762e5b732646">
+		<http:request-connection protocol="HTTPS" host="${batch.data.host}" port="${batch.data.port}" tlsContext="TLS_Context1" />
 	</http:request-config>
 
-	<os:object-store name="Batch_Error_Object_store" doc:name="Object store"
-		doc:id="7a0f52e9-5e60-49a1-91d4-c5071fc56869" entryTtl="${cache.failure.ttl}"
-		expirationInterval="${cache.failure.interval}" />
+	<os:object-store name="Batch_Error_Object_store" doc:name="Object store" doc:id="7a0f52e9-5e60-49a1-91d4-c5071fc56869" entryTtl="${cache.failure.ttl}" expirationInterval="${cache.failure.interval}" />
 
 	<vm:config name="VM_Config" doc:name="VM Config" doc:id="50f4c004-1d78-4db7-a9dd-6c146da8dbaf">
 		<vm:queues>
 			<vm:queue queueName="${batch.execution.queue}" />
 		</vm:queues>
 	</vm:config>
-	
+
 </mule>

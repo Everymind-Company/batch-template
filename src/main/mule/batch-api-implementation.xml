@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
 http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
-	<flow name="batch-api-implementation-main" doc:id="77a39c15-d7bc-4e48-9ada-ff444b9bf342" >
+	<flow name="batch-api-implementation-main" doc:id="77a39c15-d7bc-4e48-9ada-ff444b9bf342">
 		<flow-ref doc:name="batch-api-implementation-status-check-subflow" doc:id="778db385-2c6c-4ee6-beee-27ae0a1715c2" name="batch-api-implementation-status-check-subflow"/>
 		<validation:is-false doc:name="Is Batch Running?" doc:id="39140f9c-fd20-4bcf-8f6c-7777abef9a82" expression="#[(payload.status == Mule::p('batch.status.running'))]"/>
 		<os:store doc:name="Update Job Status To Running" doc:id="466c71a3-bf26-4c20-ba74-62aa54f5ecc9" key="${batch.status.key}" objectStore="Batch_Error_Object_store">
 			<os:value ><![CDATA[#[transformations::common::setBatchStatusToRunning()]]]></os:value>
 		</os:store>
 		<vm:publish doc:name="Batch Execution Queue" doc:id="8f2023a7-b0a6-4215-968f-5c464c33256f" config-ref="VM_Config" sendCorrelationId="ALWAYS" queueName="${batch.execution.queue}"/>
-		<ee:transform doc:name="payload /json" doc:id="826a1bf2-a84d-437e-bbe0-99050d6ef4bd" >
+		<ee:transform doc:name="payload /json" doc:id="826a1bf2-a84d-437e-bbe0-99050d6ef4bd">
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -27,7 +33,7 @@ output application/json
 			</ee:message>
 		</ee:transform>
 	</flow>
-	<flow name="batch-api-implementation-load-data-flow" doc:id="4aaffd2c-5515-44fa-ac6a-252f9ed6dc2e" >
+	<flow name="batch-api-implementation-load-data-flow" doc:id="4aaffd2c-5515-44fa-ac6a-252f9ed6dc2e">
 		<vm:listener doc:name="Listener" doc:id="6be11d80-39b0-4fe4-8ddd-8b58182577bb" config-ref="VM_Config" queueName="${batch.execution.queue}"/>
 		<set-variable value="#[dw::util::Timer::currentMilliseconds()]" doc:name="Set Start Time in Millis" doc:id="b3f5c488-9a12-405d-8426-95669c5435cf" variableName="startTime"/>
 		<logger level="INFO" doc:name="Log Start Time ( now() )" doc:id="57b3142c-3985-403d-85b6-7dd479e624ce" message="Initializing batch #[now() as String]" category="${api.logger.package}"/>
@@ -57,8 +63,8 @@ output application/json
 	</flow>
 	<sub-flow name="batch-api-implementation-data-transform" doc:id="f9cd9ba6-f6e8-4cbb-bf06-43ded9f99a4f">
 		<ee:transform doc:name="payload /json 'Data Transformation'" doc:id="57e30767-8ce0-4543-b331-0d0cc7758ea3">
-						<ee:message>
-							<ee:set-payload><![CDATA[%dw 2.0
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 input payload application/json quote = '"',escape = '"'
 output application/json
 var data = payload
@@ -72,8 +78,8 @@ var data = payload
 	dailyTestedCt: data."Testing episodes (new)",
 	peopleTotalTestedCt: data."Cumulative testing episodes"
 }]]></ee:set-payload>
-						</ee:message>
-					</ee:transform>
+			</ee:message>
+		</ee:transform>
 	</sub-flow>
 	<sub-flow name="batch-api-implementation-status-check-subflow" doc:id="69de54db-aebf-4cca-92c1-8ec1352d245e">
 		<os:retrieve doc:name="Batch Status" doc:id="08ae2c4a-f9f4-4b79-9d3f-9b394ec95208" key="${batch.status.key}" objectStore="Batch_Error_Object_store">
@@ -103,7 +109,7 @@ var data = payload
 		</ee:transform>
 	</sub-flow>
 	<sub-flow name="batch-api-implementation-data-get" doc:id="b9b92a7a-d72e-47fd-a317-188a85620f78">
-		<ee:transform doc:name="payload /csv" doc:id="b79fa2f1-c43d-44e0-ab4a-ccf681043b18" >
+		<ee:transform doc:name="payload /csv" doc:id="b79fa2f1-c43d-44e0-ab4a-ccf681043b18">
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/csv header=true

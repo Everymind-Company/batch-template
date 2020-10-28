@@ -8,10 +8,10 @@ output application/json
     "correlationId": correlationId,
     "timestamp": now(),
     "errorDetails": [
-        {
-            "code": 405,
-            "message": "Method Not Allowed",
-            "additionalInfo": "Method Not Allowed : " ++ (error.description default "")
-        }
-    ]
+            {
+                "code": 405,
+                "message": "Method Not Allowed",
+                "additionalInfo": "Method Not Allowed : " ++ (error.description default "")
+            }
+        ]
 }
