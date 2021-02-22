@@ -26,9 +26,43 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
+var data = payload
 ---
 {
-	message: "Batch Execution started "
+	countyName: data."Local Authority",
+	reportDt: data."Specimen date",
+	peoplePositiveNewCasesCt: data."Cases (new)",
+	peoplePositiveCasesCt: data."Cumulative cases",
+	peoplePositiveCasesRate: data."Cumulative incidence per 100,000 population",
+	dailyTestedCt: data."Testing episodes (new)",
+	peopleTotalTestedCt: data."Cumulative testing episodes"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="batch-api-implementation-status-check-subflow" doc:id="69de54db-aebf-4cca-92c1-8ec1352d245e">
+		<os:retrieve doc:name="Batch Status" doc:id="08ae2c4a-f9f4-4b79-9d3f-9b394ec95208" key="${batch.status.key}" objectStore="Batch_Error_Object_store">
+			<os:default-value><![CDATA[#[{
+	"status": "",
+	"lastRun": ""
+}]]]></os:default-value>
+		</os:retrieve>
+		<logger level="INFO" message="Batch Status #[payload]" category="${api.logger.package}" />
+	</sub-flow>
+	<sub-flow name="batch-api-implementation-status-clear" doc:id="e1ebcb92-5d46-4437-8d88-1df3306f02dc">
+		<try doc:name="Try" doc:id="8bc53652-db9f-4f48-978c-f5486888ee56">
+			<os:remove doc:name="Batch Status" doc:id="b207797f-d3cc-4b88-9b83-b0bb60d510ff" key="${batch.status.key}" objectStore="Batch_Error_Object_store" />
+			<error-handler>
+				<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="65622210-f28c-447e-9dba-67d831e0f136" type="OS:KEY_NOT_FOUND">
+					<logger level="INFO" doc:name="No Key Found" doc:id="c3dd3a53-17ab-4766-8fe1-d6b774656e09" message="No Batch status found to clear" category="${api.logger.package}" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="payload /json" doc:id="c617eb73-856b-4723-9b5b-c8b9757971ee">
+			<ee:message>
+				<ee:set-payload><![CDATA[output application/json --- 
+{
+	message: "Job status cleared"
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
