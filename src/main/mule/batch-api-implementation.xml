@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<sub-flow name="check-batch-status" doc:id="69de54db-aebf-4cca-92c1-8ec1352d245e" >
+		<os:retrieve doc:name="Batch Status" doc:id="08ae2c4a-f9f4-4b79-9d3f-9b394ec95208" key="${batch.status.key}" objectStore="Batch_Error_Object_store">
+			<os:default-value ><![CDATA[#[{
+	"status": "",
+	"lastRun": ""
+}]]]></os:default-value>
+		</os:retrieve>
+		<logger level="INFO" message="Batch Status #[payload]" category="${api.logger.package}"/>
+	</sub-flow>
+</mule>
