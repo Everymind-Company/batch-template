@@ -94,6 +94,7 @@
 			<artifactId>mule-vm-connector</artifactId>
 			<version>2.0.0</version>
 			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>
@@ -134,6 +135,12 @@
 			<id>mulesoft-releases</id>
 			<name>MuleSoft Releases Repository</name>
 			<url>https://repository.mulesoft.org/releases/</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>anypoint-exchange-v3</id>
+			<name>Anypoint Exchange V3</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
 			<layout>default</layout>
 		</repository>
 	</repositories>
