@@ -1,127 +1,109 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-	
-	<error-handler name="batch-api-error-handler"
-		doc:id="976e2f97-e049-4efc-a213-c7b9e50b41c8">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<error-handler name="batch-api-error-handler" doc:id="976e2f97-e049-4efc-a213-c7b9e50b41c8">
+
 		<on-error-propagate type="APIKIT:BAD_REQUEST">
-			<ee:transform
-				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
-				doc:name="Bad Request Message">
+				doc:name="payload 'badRequestMessage.dwl', vars.httpStatus=400 'Bad Request Message'">
 				<ee:message>
-					<ee:set-payload
-						resource="transformations/error/badRequestMessage.dwl" />
+					<ee:set-payload resource="transformations/error/badRequestMessage.dwl" />
 				</ee:message>
 				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[400
-					]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
+
 		<on-error-propagate type="APIKIT:NOT_FOUND">
-			<ee:transform
-				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
-				doc:name="Not Found Message">
+				doc:name="payload 'notFoundMessage.dwl', vars.httpStatus=404 Not Found Message">
 				<ee:message>
-					<ee:set-payload
-						resource="transformations/error/notFoundMessage.dwl" />
+					<ee:set-payload resource="transformations/error/notFoundMessage.dwl" />
 				</ee:message>
 				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[404
-					]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate
-			type="APIKIT:METHOD_NOT_ALLOWED">
-			<ee:transform
-				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+
+		<on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
-				doc:name="Method Not Allowed Message">
+				doc:name="payload 'methodNotAllowedMessage.dwl', vars.httpStatus=405 Method Not Allowed Message">
 				<ee:message>
-					<ee:set-payload
-						resource="transformations/error/methodNotAllowedMessage.dwl" />
+					<ee:set-payload resource="transformations/error/methodNotAllowedMessage.dwl" />
 				</ee:message>
 				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[405
-					]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
+
 		<on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
-			<ee:transform
-				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
-				doc:name="Not Acceptable Message">
+				doc:name="payload 'notAcceptableMessage.dwl' vars.httpStatus=406 Not Acceptable Message">
 				<ee:message>
-					<ee:set-payload
-						resource="transformations/error/notAcceptableMessage.dwl" />
+					<ee:set-payload resource="transformations/error/notAcceptableMessage.dwl" />
 				</ee:message>
 				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[406
-					]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[406]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		<on-error-propagate
-			type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
-			<ee:transform
-				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+
+		<on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
-				doc:name="Unsupported Media Type Message">
+				doc:name="payload 'unsupportedMediaTypeMessage.dwl' vars.httpStatus=415 Unsupported Media Type Message">
 				<ee:message>
-					<ee:set-payload
-						resource="transformations/error/unsupportedMediaTypeMessage.dwl" />
+					<ee:set-payload resource="transformations/error/unsupportedMediaTypeMessage.dwl" />
 				</ee:message>
 				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[415
-					]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
+
 		<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
-			<ee:transform
-				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
-				doc:name="Not Implemented Message">
+				doc:name="payload 'notImplementedMessage.dwl' vars.httpStatus=501 Not Implemented Message">
 				<ee:message>
-					<ee:set-payload
-						resource="transformations/error/notImplementedMessage.dwl" />
+					<ee:set-payload resource="transformations/error/notImplementedMessage.dwl" />
 				</ee:message>
 				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[501
-					]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[501]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
+
 		<on-error-propagate type="VALIDATION:INVALID_BOOLEAN">
-			<ee:transform
-				xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
 				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
-				doc:name="Validation Errors">
+				doc:name="Validation Errors | payload notImplementedMessage.dwl | vars.httpStatus=400">
 				<ee:message>
-					<ee:set-payload
-						resource="transformations/error/notImplementedMessage.dwl" />
+					<ee:set-payload resource="transformations/error/notImplementedMessage.dwl" />
 				</ee:message>
 				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[400				]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 		</on-error-propagate>
-		
-		<on-error-propagate enableNotifications="true"
-			logException="true" doc:name="On Error Propagate"
+
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate"
 			doc:id="3470b423-2261-4b57-a797-643f3c4a1c5d" type="ANY">
-			<ee:transform doc:name="Generic Error Message"
+			<ee:transform doc:name="Generic Error Message | payload 'genericMessage.dwl' | vars.httpStatus=500"
 				doc:id="0264e2d2-24da-422d-95df-2839191f7ab1">
 				<ee:message>
-					<ee:set-payload
-						resource="transformations/error/genericMessage.dwl" />
+					<ee:set-payload resource="transformations/error/genericMessage.dwl" />
 				</ee:message>
 				<ee:variables>
 					<ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
@@ -129,5 +111,5 @@
 			</ee:transform>
 		</on-error-propagate>
 	</error-handler>
-	
-	</mule>
+
+</mule>
