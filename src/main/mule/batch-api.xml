@@ -43,19 +43,19 @@ output application/json
     <flow name="get:\healthcheck:api-config">
 		<flow-ref doc:name="batch-api-util-get-healthcheck" doc:id="9b31a475-2518-4e69-819a-0c37ec348e76" name="batch-api-util-get-healthcheck" />
     </flow>
+	<flow name="get:\batch\run:api-config">
+		<flow-ref doc:name="batch-api-implementation-main" doc:id="52a98730-7d61-4d29-a859-6da9ca2646dc" name="batch-api-implementation-main" />
+    </flow>
+	<flow name="get:\batch\status:api-config">
+		<flow-ref doc:name="batch-api-implementation-status-check-subflow" doc:id="23e070c1-e36c-4ef9-8985-d101ab396934" name="batch-api-implementation-status-check-subflow" />
+		<set-payload value="#[output application/json --- payload]" doc:name="/json" doc:id="4a78c002-204a-4676-9749-3659970e810e" />
+    </flow>
 	<flow name="get:\failure:api-config">
         <os:retrieve-all doc:name="Retrieve all" doc:id="fe65f63a-2c4a-4f79-b468-49d1b8aba910" objectStore="Batch_Error_Object_store" />
         <set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="3129bf3f-5eac-4017-8ce0-b5b226136f3d" />
     </flow>
     <flow name="get:\data:api-config">
         <logger level="INFO" message="get:\data:api-config" />
-    </flow>
-    <flow name="get:\batch\run:api-config">
-        <logger level="INFO" message="get:\batch\run:api-config" />
-    </flow>
-	<flow name="get:\batch\status:api-config">
-		<flow-ref doc:name="batch-api-implementation-status-check" doc:id="23e070c1-e36c-4ef9-8985-d101ab396934" name="batch-api-implementation-status-check" />
-		<set-payload value="#[output application/json --- payload]" doc:name="/json" doc:id="4a78c002-204a-4676-9749-3659970e810e" />
     </flow>
 	<flow name="delete:\batch\status:api-config">
         <logger level="INFO" message="delete:\batch\status:api-config" />
