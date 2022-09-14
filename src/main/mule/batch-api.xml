@@ -54,10 +54,10 @@ output application/json
         <os:retrieve-all doc:name="Retrieve all" doc:id="fe65f63a-2c4a-4f79-b468-49d1b8aba910" objectStore="Batch_Error_Object_store" />
         <set-payload value="#[output application/json --- payload]" doc:name="Set Payload" doc:id="3129bf3f-5eac-4017-8ce0-b5b226136f3d" />
     </flow>
-    <flow name="get:\data:api-config">
-        <logger level="INFO" message="get:\data:api-config" />
+    <flow name="delete:\batch\status:api-config">
+		<flow-ref doc:name="batch-api-implementation-status-clear" doc:id="26a1d005-8dc6-414f-aa1c-d1d2b5a59c30" name="batch-api-implementation-status-clear" />
     </flow>
-	<flow name="delete:\batch\status:api-config">
-        <logger level="INFO" message="delete:\batch\status:api-config" />
+	<flow name="get:\data:api-config">
+		<flow-ref doc:name="batch-api-implementation-data-get" doc:id="0ee07ff6-2582-4fbb-bbde-8cd5c05a2ba4" name="batch-api-implementation-data-get" />
     </flow>
 </mule>

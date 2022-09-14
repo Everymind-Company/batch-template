@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
-	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
 http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
 	<flow name="batch-api-implementation-main" doc:id="77a39c15-d7bc-4e48-9ada-ff444b9bf342" >
 		<flow-ref doc:name="batch-api-implementation-status-check-subflow" doc:id="778db385-2c6c-4ee6-beee-27ae0a1715c2" name="batch-api-implementation-status-check-subflow"/>
 		<validation:is-false doc:name="Is Batch Running?" doc:id="39140f9c-fd20-4bcf-8f6c-7777abef9a82" expression="#[(payload.status == Mule::p('batch.status.running'))]"/>
-		<os:store doc:name="Update Job Status To Running" doc:id="466c71a3-bf26-4c20-ba74-62aa54f5ecc9" key="${batch.status.key}">
+		<os:store doc:name="Update Job Status To Running" doc:id="466c71a3-bf26-4c20-ba74-62aa54f5ecc9" key="${batch.status.key}" objectStore="Batch_Error_Object_store">
 			<os:value ><![CDATA[#[transformations::common::setBatchStatusToRunning()]]]></os:value>
 		</os:store>
 		<vm:publish doc:name="Batch Execution Queue" doc:id="8f2023a7-b0a6-4215-968f-5c464c33256f" config-ref="VM_Config" sendCorrelationId="ALWAYS" queueName="${batch.execution.queue}"/>
@@ -25,16 +27,89 @@ output application/json
 			</ee:message>
 		</ee:transform>
 	</flow>
-	<flow name="batch-api-implementationFlow" doc:id="4aaffd2c-5515-44fa-ac6a-252f9ed6dc2e" >
+	<flow name="batch-api-implementation-load-data-flow" doc:id="4aaffd2c-5515-44fa-ac6a-252f9ed6dc2e" >
 		<vm:listener doc:name="Listener" doc:id="6be11d80-39b0-4fe4-8ddd-8b58182577bb" config-ref="VM_Config" queueName="${batch.execution.queue}"/>
+		<set-variable value="#[dw::util::Timer::currentMilliseconds()]" doc:name="Set Start Time in Millis" doc:id="b3f5c488-9a12-405d-8426-95669c5435cf" variableName="startTime"/>
+		<logger level="INFO" doc:name="Log Start Time ( now() )" doc:id="57b3142c-3985-403d-85b6-7dd479e624ce" message="Initializing batch #[now() as String]" category="${api.logger.package}"/>
+		<http:request method="GET" doc:name="Load CSV Data /csv" doc:id="6bd9c5b9-c4b8-455b-9ce1-df3b29ec7f71" config-ref="HTTP_Request_configuration" path="${batch.data.path}" outputMimeType="application/csv; ignoreemptyline=true"/>
+		<set-payload value="#[output application/json --- payload]" doc:name="CSV to JSON" doc:id="2436e4e3-8133-4572-80cc-bb17efec0f92" />
+		<batch:job jobName="batch-api-Batch_Job" doc:id="29735ca0-2d80-41b3-a57e-aca049b32000" maxFailedRecords="-1" jobInstanceId="#['Job From ' ++ now() as String {format: 'dd/MM/yy hh:mm:ss'}]">
+			<batch:process-records >
+				<batch:step name="Process_Only_Known_LocalAuthority" doc:id="099406a3-32bc-49e7-ad03-93e875115258" acceptExpression="#[payload.'Local Authority' != 'Unknown']">
+					<flow-ref doc:name="batch-api-implementation-data-transform" doc:id="5b48a3eb-d4c8-4a89-af2e-aaf3eb0233c4" name="batch-api-implementation-data-transform" target="step_01"/>
+				</batch:step>
+				<batch:step name="Raise_Error_On_Unknown_LocalAuthority" doc:id="8a125d64-d41a-4962-9586-209f1952ef65" acceptExpression="#[payload.'Local Authority' == 'Unknown']">
+					<logger level="INFO" doc:name="Log Do Something Corrupt Data" doc:id="fa601dfc-29e5-4fcf-8ec0-e1548fbb9d8a" message="Found Unknown Location, raise error" category="${api.logger.package}"/>
+					<raise-error doc:name="Raise error" doc:id="95cf0c72-2375-4784-9e90-86f412e3b431" type="APP:CUSTOM" description="Fail for Unknown"/>
+				</batch:step>
+				<batch:step name="Process_Errors" doc:id="66612360-eb3b-4566-a1de-25024c27dbdf" acceptPolicy="ONLY_FAILURES">
+					<logger level="INFO" doc:name="Process Errors" doc:id="7074aae3-4191-4270-8faf-993433005d4b" message='Processing failed records #[Batch::getStepExceptions()], #[payload]' category="${api.logger.package}"/>
+					<os:store doc:name="Store" doc:id="f3a3c84f-3191-4400-8465-6a3d6c8054a3" key="#[payload.'Local Authority' default '']" objectStore="Batch_Error_Object_store"/>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<os:store doc:name="Update Job Status To complete" doc:id="78a276a7-d054-4bd2-ac8d-f0a842903db4" key="${batch.status.key}" objectStore="Batch_Error_Object_store">
+					<os:value ><![CDATA[#[transformations::common::setBatchStatusToComplete()]]]></os:value>
+				</os:store>
+				<logger level="INFO" doc:name="Batch Result" doc:id="221c6ec0-915b-4f70-8025-e8ab98f9e24a" message="Total Time Taken #[dw::util::Timer::currentMilliseconds() - vars.startTime], Batch Result #[output application/json --- payload]" category="${api.logger.package}"/>
+			</batch:on-complete>
+		</batch:job>
 	</flow>
-	<sub-flow name="batch-api-implementation-status-check-subflow" doc:id="69de54db-aebf-4cca-92c1-8ec1352d245e" >
+	<sub-flow name="batch-api-implementation-data-transform" doc:id="f9cd9ba6-f6e8-4cbb-bf06-43ded9f99a4f">
+		<ee:transform doc:name="payload /json 'Data Transformation'" doc:id="57e30767-8ce0-4543-b331-0d0cc7758ea3">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+input payload application/json quote = '"',escape = '"'
+output application/json
+var data = payload
+---
+{
+	countyName: data."Local Authority",
+	reportDt: data."Specimen date",
+	peoplePositiveNewCasesCt: data."Cases (new)",
+	peoplePositiveCasesCt: data."Cumulative cases",
+	peoplePositiveCasesRate: data."Cumulative incidence per 100,000 population",
+	dailyTestedCt: data."Testing episodes (new)",
+	peopleTotalTestedCt: data."Cumulative testing episodes"
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+	</sub-flow>
+	<sub-flow name="batch-api-implementation-status-check-subflow" doc:id="69de54db-aebf-4cca-92c1-8ec1352d245e">
 		<os:retrieve doc:name="Batch Status" doc:id="08ae2c4a-f9f4-4b79-9d3f-9b394ec95208" key="${batch.status.key}" objectStore="Batch_Error_Object_store">
-			<os:default-value ><![CDATA[#[{
+			<os:default-value><![CDATA[#[{
 	"status": "",
 	"lastRun": ""
 }]]]></os:default-value>
 		</os:retrieve>
-		<logger level="INFO" message="Batch Status #[payload]" category="${api.logger.package}"/>
+		<logger level="INFO" message="Batch Status #[payload]" category="${api.logger.package}" />
+	</sub-flow>
+	<sub-flow name="batch-api-implementation-status-clear" doc:id="e1ebcb92-5d46-4437-8d88-1df3306f02dc">
+		<try doc:name="Try" doc:id="8bc53652-db9f-4f48-978c-f5486888ee56">
+			<os:remove doc:name="Batch Status" doc:id="b207797f-d3cc-4b88-9b83-b0bb60d510ff" key="${batch.status.key}" objectStore="Batch_Error_Object_store" />
+			<error-handler>
+				<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="65622210-f28c-447e-9dba-67d831e0f136" type="OS:KEY_NOT_FOUND">
+					<logger level="INFO" doc:name="No Key Found" doc:id="c3dd3a53-17ab-4766-8fe1-d6b774656e09" message="No Batch status found to clear" category="${api.logger.package}" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="payload /json" doc:id="c617eb73-856b-4723-9b5b-c8b9757971ee">
+			<ee:message>
+				<ee:set-payload><![CDATA[output application/json --- 
+{
+	message: "Job status cleared"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="batch-api-implementation-data-get" doc:id="b9b92a7a-d72e-47fd-a317-188a85620f78">
+		<ee:transform doc:name="payload /csv" doc:id="b79fa2f1-c43d-44e0-ab4a-ccf681043b18" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv header=true
+---
+readUrl("classpath://data/data.csv", "application/csv")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</sub-flow>
 </mule>
