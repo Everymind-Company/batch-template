@@ -54,7 +54,7 @@ output application/json
         <logger level="INFO" message="get:\batch\run:api-config" />
     </flow>
 	<flow name="get:\batch\status:api-config">
-		<flow-ref doc:name="check-batch-status" doc:id="23e070c1-e36c-4ef9-8985-d101ab396934" name="check-batch-status" />
+		<flow-ref doc:name="batch-api-implementation-status-check" doc:id="23e070c1-e36c-4ef9-8985-d101ab396934" name="batch-api-implementation-status-check" />
 		<set-payload value="#[output application/json --- payload]" doc:name="/json" doc:id="4a78c002-204a-4676-9749-3659970e810e" />
     </flow>
 	<flow name="delete:\batch\status:api-config">
