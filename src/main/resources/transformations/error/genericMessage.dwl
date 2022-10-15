@@ -8,10 +8,10 @@ output application/json
     "correlationId": correlationId,
     "timestamp": now(),
     "errorDetails": [
-        {
-            "code": 500,
-            "message": "Internal Server Error",
-            "additionalInfo": "Internal Server Error : " ++ (error.description default "")
-        }
-    ]
+            {
+                "code": 500,
+                "message": "Internal Server Error",
+                "additionalInfo": "Internal Server Error : " ++ (error.description default "")
+            }
+        ]
 }

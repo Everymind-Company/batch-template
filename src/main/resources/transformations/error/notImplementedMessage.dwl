@@ -8,10 +8,10 @@ output application/json
     "correlationId": correlationId,
     "timestamp": now(),
     "errorDetails": [
-        {
-            "code": 400,
-            "message": error.description,
-            "additionalInfo": "Validation Failure : " ++ (error.description default "")
-        }
-    ]
+            {
+                "code": 400,
+                "message": error.description,
+                "additionalInfo": "Validation Failure : " ++ (error.description default "")
+            }
+        ]
 }

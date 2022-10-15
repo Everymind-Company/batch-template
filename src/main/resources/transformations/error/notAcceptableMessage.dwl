@@ -8,10 +8,10 @@ output application/json
     "correlationId": correlationId,
     "timestamp": now(),
     "errorDetails": [
-        {
-            "code": 406,
-            "message": "Not Acceptable",
-            "additionalInfo": "Not Acceptable : " ++ (error.description default "")
-        }
-    ]
+            {
+                "code": 406,
+                "message": "Not Acceptable",
+                "additionalInfo": "Not Acceptable : " ++ (error.description default "")
+            }
+        ]
 }

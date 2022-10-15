@@ -8,10 +8,10 @@ output application/json
     "correlationId": correlationId,
     "timestamp": now(),
     "errorDetails": [
-        {
-            "code": 404,
-            "message": "Not Found",
-            "additionalInfo": "Not Found : " ++ (error.description default "")
-        }
-    ]
+            {
+                "code": 404,
+                "message": "Not Found",
+                "additionalInfo": "Not Found : " ++ (error.description default "")
+            }
+        ]
 }
