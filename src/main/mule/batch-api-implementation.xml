@@ -15,6 +15,24 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
 http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	<flow name="batch-api-implementation-main" doc:id="2e7c51a3-fc4b-47c1-a27c-d1a95f3ff181">
+		<flow-ref doc:name="check-batch-status" doc:id="a6c3bfae-0f8f-430c-a2a6-ef45c8432d00" name="check-batch-status" />
+		<validation:is-false doc:id="863067cc-c81c-4875-815d-99de2e1c9f6f" doc:name="Is Batch Running?" expression="#[(payload.status == Mule::p('batch.status.running'))]" message="An existing job is running. Please try again later" />
+		<os:store doc:name="Update Job Status To Running" doc:id="4c679d49-172d-4b10-94d0-92c844817ad1" key="${batch.status.key}" objectStore="Batch_Error_Object_store">
+			<os:value><![CDATA[#[transformations::common::setBatchStatusToRunning()]]]></os:value>
+		</os:store>
+		<vm:publish doc:name="Publish - Batch Execution Queue" doc:id="e660039c-0667-4dbd-99e9-c00cf69ef80d" config-ref="VM_Config" queueName="${batch.execution.queue}" sendCorrelationId="ALWAYS" />
+		<ee:transform doc:name="Response" doc:id="2a750db6-740d-49b8-976c-bacc5080b7ac">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Batch Execution started "
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
 	<flow name="batch-api-load-data" doc:id="d6000e51-9289-4848-a704-af68d30d70c0">
 		<vm:listener queueName="${batch.execution.queue}" doc:name="Listener" doc:id="95639fdb-138e-4486-8ffd-e9da04320980" config-ref="VM_Config" />
 		<set-variable value="#[dw::util::Timer::currentMilliseconds()]" doc:name="Set Start Time in Millis" doc:id="f67c51e1-aff2-4bca-940d-2d37fe515b10" variableName="startTime" />
@@ -45,32 +63,6 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 				 category="${api.logger.package}" />
 			</batch:on-complete>
 		</batch:job>
-	</flow>
-	<flow name="batch-api-implementation-main"
-		doc:id="2e7c51a3-fc4b-47c1-a27c-d1a95f3ff181">
-		<flow-ref doc:name="check-batch-status"
-			doc:id="a6c3bfae-0f8f-430c-a2a6-ef45c8432d00"
-			name="check-batch-status" />
-		<validation:is-false
-			doc:id="863067cc-c81c-4875-815d-99de2e1c9f6f"
-			doc:name="Is Batch Running?"
-			expression="#[(payload.status == Mule::p('batch.status.running'))]"
-			message="An existing job is running. Please try again later" />
-		<os:store doc:name="Update Job Status To Running" doc:id="4c679d49-172d-4b10-94d0-92c844817ad1" key="${batch.status.key}" objectStore="Batch_Error_Object_store">
-			<os:value><![CDATA[#[transformations::common::setBatchStatusToRunning()]]]></os:value>
-		</os:store>
-		<vm:publish doc:name="Publish - Batch Execution Queue" doc:id="e660039c-0667-4dbd-99e9-c00cf69ef80d" config-ref="VM_Config" queueName="${batch.execution.queue}" sendCorrelationId="ALWAYS"/>
-		<ee:transform doc:name="Response"
-			doc:id="2a750db6-740d-49b8-976c-bacc5080b7ac">
-			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	message: "Batch Execution started "
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
 	</flow>
 	<flow name="batch-api-implementationFlow" doc:id="293407f3-2122-4c61-b6d8-e6e5ab75b17e" >
 		<scheduler doc:name="Scheduler" doc:id="9d441947-5f13-40b3-ae76-4e7d32673fd1" >
